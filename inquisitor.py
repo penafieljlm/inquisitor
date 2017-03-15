@@ -217,7 +217,7 @@ def visualize(repository):
     web_dir = os.path.join(os.path.dirname(__file__), 'report')
     os.chdir(web_dir)
     # Dump visualization to JSON file
-    with open(os.path.join(web_dir, 'report.json'), 'w') as handle:
+    with open('report.json', 'w') as handle:
         json.dump(root, handle, indent=4, sort_keys=True)
     # Start HTTP Server
     port = 8080

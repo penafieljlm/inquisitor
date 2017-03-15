@@ -4,7 +4,7 @@ import logging
 import urlparse
 
 class LinkedInValidateException(Exception):
-	pass
+    pass
 
 def canonicalize(linkedin):
     if not linkedin:
@@ -12,18 +12,19 @@ def canonicalize(linkedin):
     if not isinstance(linkedin, str) and not isinstance(linkedin, unicode):
         raise LinkedInValidateException('LinkedIn accounts must be strings')
     # Validate URL
+    linkedin = linkedin.strip().lower()
     parsed = urlparse.urlparse(linkedin)
     # Validate Network Location
     if not parsed.netloc.endswith('linkedin.com'):
-    	raise LinkedInValidateException(
-    		'Failed to validate LinkedIn account: {}'.format(linkedin)
-		)
-	# Validate Path
-	if not parser.path.startswith('/in/'):
-		raise LinkedInValidateException(
-			'Failed to validate LinkedIn account: {}'.format(linkedin)
-		)
-	# Return the URL
+        raise LinkedInValidateException(
+            'Failed to validate LinkedIn account: {}'.format(linkedin)
+        )
+    # Validate Path
+    if not parser.path.startswith('/in/'):
+        raise LinkedInValidateException(
+            'Failed to validate LinkedIn account: {}'.format(linkedin)
+        )
+    # Return the URL
     return linkedin
 
 def main_classify_args(parser):
@@ -72,16 +73,16 @@ def main_classify_canonicalize(args):
 
 class LinkedIn(inquisitor.assets.Asset):
 
-	def __init__(self, linkedin):
-		super(self.__class__, self).__init__(owned=owned)
-		self.linkedin = canonicalize(linkedin)
+    def __init__(self, linkedin):
+        super(self.__class__, self).__init__(owned=owned)
+        self.linkedin = canonicalize(linkedin)
         self.username = urlparse.urlparse(self.linkedin).path.split('/')[3]
-		# TODO: This should be retrieved using linkedin api but we don't have
-		# TODO: time for that, so fill it up using Google Search results
-		# TODO: instead
-		self.corporation = None
+        # TODO: This should be retrieved using linkedin api but we don't have
+        # TODO: time for that, so fill it up using Google Search results
+        # TODO: instead
+        self.corporation = None
 
-	def __eq__(self, other):
+    def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
         return self.linkedin == other.linkedin
@@ -103,13 +104,13 @@ class LinkedIn(inquisitor.assets.Asset):
         return results
 
     def transform(self, repo, sources):
-    	# Prepare the results
+        # Prepare the results
         assets = set()
         # Return the results
         return assets
 
     def is_owned(self, repo):
-		# If manually classified, return the classification
+        # If manually classified, return the classification
         if self.owned is not None:
             return self.owned
         # Automatically determine ownership
