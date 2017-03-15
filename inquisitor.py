@@ -1,15 +1,104 @@
 import argparse
 import inquisitor
+import inquisitor.sources.google_search
+import inquisitor.sources.shodan_search
 import json
+import logging
+import sys
 import tabulate
+
+# Ininitialize Logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 def database(path):
     return inquisitor.IntelligenceRepository(path)
 
-def scan(repository):
-    # TODO: implement
-    # TODO: don't transform non owned assets
-    pass
+def scan(
+    repository,
+    google_dev_key=None, 
+    google_cse_id=None, 
+    google_limit=None, 
+    shodan_api_key=None
+):
+    sources = dict()
+    # Initialize Google as a transform source
+    if not google_dev_key or not google_cse_id:
+        if not google_dev_key:
+            logger.warning(
+                'Skipping Google Transforms. No GOOGLE_DEV_KEY provided. '
+                'Please provide the GOOGLE_DEV_KEY using the --google-dev-key '
+                'parameter.'
+            )
+        if not google_cse_id:
+            logger.warning(
+                'Skipping Google Transforms. No GOOGLE_CSE_ID provided. '
+                'Please provide the GOOGLE_CSE_ID using the --google-cse-id '
+                'parameter.'
+            )
+    else:
+        sources['google'] = inquisitor.sources.google_search.GoogleAPI(
+            google_dev_key, google_cse_id, limit=google_limit
+        )
+        if not google_limit:
+            logger.warning(
+                'Google Search limit not set. This may potentially exhaust '
+                'the daily quota of your Google API Key.'
+            )
+    # Initialize Shodan as a transform source
+    if not shodan_api_key:
+        logger.warning(
+            'Skipping Shodan Transforms. No SHODAN_API_KEY provided. '
+            'Please provide the SHODAN_API_KEY using the --shodan-api-key '
+            'parameter.'
+        )
+    else:
+        sources['shodan'] = inquisitor.sources.shodan_search.ShodanAPI(
+            shodan_api_key
+        )
+    # Check if any sources detected
+    if not sources:
+        logger.error('No valid transform sources available. Quitting.')
+        exit(1)
+    # Perform transforms on owned assets only
+    found = 0
+    logger.info('Initializing Inquisitor scan mode')
+    owned = repository.get_assets(include=lambda o,d: o.is_owned(repository))
+    if not owned:
+        logger.error(
+            'No assets available to transform. Please seed your database '
+            'using the "classify" command.'
+        )
+        exit(1)
+    for asset in owned:
+        asset_type = asset.__class__
+        asset_module_name = asset_type.__module__
+        asset_module = sys.modules[asset_module_name]
+        asset_identifier = getattr(asset, asset_module.OBJECT_ID)
+        logger.info('Transforming: {}: {}'.format(
+            asset_module_name,
+            asset_identifier,
+        ))
+        for result in asset.transform(repository, sources):
+            __id = repository.put_asset_object(result)
+            if __id:
+                result_type = result.__class__
+                result_module_name = result_type.__module__
+                result_module = sys.modules[result_module_name]
+                result_identifier = getattr(result, result_module.OBJECT_ID)
+                logger.info('Found: {}: {}'.format(
+                    result_module_name,
+                    result_identifier,
+                ))
+            found += 1
+        repository.put_asset_object(asset, overwrite=True)
+    logger.info('New assets found: {}'.format(found))
+    logger.info('Inquisitor has completed')
 
 def status(repository, strong):
     table = [
@@ -46,11 +135,11 @@ def classify(repository, args):
         # Extract assets from arguments
         classified = asset_module.main_classify_canonicalize(args)
         accepted, unmarked, rejected = classified
-        targets = (
+        targets = [
             (accepted, True),
             (unmarked, None),
             (rejected, False),
-        )
+        ]
         # Execute asset classification
         for target, owned in targets:
             for identifier in target:
@@ -66,7 +155,9 @@ def dump(repository, path, all_flag):
     for asset_module in inquisitor.ASSET_MODULES:
         asset_type = asset_module.ASSET_CLASS
         asset_list = list()
-        results = repository.get_assets(asset_types=[asset_type])
+        results = repository.get_assets(
+            include=lambda o,d: isinstance(o, asset_type)
+        )
         for asset in results:
             if all_flag or asset.owned is not False:
                 asset_entry = dict(asset.__dict__)
@@ -82,9 +173,47 @@ def dump(repository, path, all_flag):
         with open(path, 'w') as handle:
             json.dump(repo_dict, handle, indent=4, sort_keys=True)
 
-def visualize(repository, visualize_path):
-    # TODO: implement
-    pass
+def visualize(repository):
+    # TODO: use circle packing https://bl.ocks.org/mbostock/7607535
+    def traverse(node, asset):
+        # Determine name of node
+        if asset:
+            asset_type = asset.__class__
+            asset_module = sys.modules[asset_type.__module__]
+            node['name'] = '{} : {}'.format(
+                asset_type.__name__,
+                getattr(asset, asset_module.OBJECT_ID)
+            )
+        else:
+            node['name'] = 'root'
+        # Determine node children
+        children = repository.get_assets(
+            include=lambda o,d:
+                o.is_owned(repository) and
+                o.parent_asset(repository) == asset
+        )
+        if children:
+            node['children'] = list()
+            for child in children:
+                subnode = dict()
+                traverse(subnode, child)
+                node['children'].append(subnode)
+        else:
+            node['size'] = 1
+    # Start traversal
+    root = {}
+    traverse(root, None)
+    # Dump visualization to JSON file
+    with open('report.json', 'w') as handle:
+        json.dump(root, handle, indent=4, sort_keys=True)
+    # Start HTTP Server
+    import SimpleHTTPServer
+    import SocketServer
+    import webbrowser
+    webbrowser.open('http://localhost:8080/report.html', new=2)
+    http_handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+    httpd = SocketServer.TCPServer(("", 8080), http_handler)
+    httpd.serve_forever()
 
 # Entry Point
 if __name__ == '__main__':
@@ -129,7 +258,7 @@ if __name__ == '__main__':
             'specified, the script will simply skip asset transforms that '
             'involve Google Search.'
         ),
-        dest='GOOGLE_DEV_KEY',
+        dest='google_dev_key',
     )
     scan_parser.add_argument(
         '--google-cse-id',
@@ -142,7 +271,17 @@ if __name__ == '__main__':
             'script will simply skip asset transforms that involve Google '
             'Search.'
         ),
-        dest='GOOGLE_CSE_KEY',
+        dest='google_cse_id',
+    )
+    scan_parser.add_argument(
+        '--google-limit',
+        metavar='GOOGLE_LIMIT',
+        type=int,
+        help=(
+            'The number of pages to limit Google Search to. This is to avoid '
+            'exhausting your daily quota.'
+        ),
+        default=None,
     )
     scan_parser.add_argument(
         '--shodan-api-key',
@@ -155,7 +294,7 @@ if __name__ == '__main__':
             'specified, the script will simply skip asset transforms that '
             'involve Shodan.'
         ),
-        dest='SHODAN_API_KEY',
+        dest='shodan_api_key',
     )
 
     # Parse arguments for status command
@@ -218,22 +357,19 @@ if __name__ == '__main__':
         ),
         parents=[parent_parser],
     )
-    visualize_parser.add_argument(
-        'visualize_path',
-        metavar='HTML_FILE',
-        type=str,
-        help=(
-            'The path to dump the visualization file to. Overwrites existing '
-            'files.'
-        ),
-    )
 
     # Perform actual parsing of arguments
     args = main_parser.parse_args()
 
     # Determine chosen command and pass to appropriate subroutine
     if args.command == 'scan':
-        scan(args.database)
+        scan(
+            args.database, 
+            google_dev_key=args.google_dev_key, 
+            google_cse_id=args.google_cse_id, 
+            google_limit=args.google_limit,
+            shodan_api_key=args.shodan_api_key,
+        )
         exit(0)
     if args.command == 'status':
         status(args.database, args.strong)
@@ -245,5 +381,5 @@ if __name__ == '__main__':
         dump(args.database, args.json, args.all)
         exit(0)
     if args.command == 'visualize':
-        visualize(args.database, args.visualize_path)
+        visualize(args.database)
         exit(0)

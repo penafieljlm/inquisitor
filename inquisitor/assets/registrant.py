@@ -1,3 +1,4 @@
+import inquisitor.assets
 import unidecode
 import urlparse
 
@@ -48,19 +49,19 @@ def main_classify_canonicalize(args):
     redundant = set.intersection(accepted, unmarked, rejected)
     if redundant:
         raise ValueError(
-            ('The following registrants were classified '
-            'more than once: {}').format(list(redundant))
+            ('Conflicting classifications for registrants '
+            ': {}').format(list(redundant))
         )
     accepted = set([canonicalize(a) for a in accepted])
     unmarked = set([canonicalize(a) for a in unmarked])
     rejected = set([canonicalize(a) for a in rejected])
     return (accepted, unmarked, rejected)
 
-class Registrant(object):
+class Registrant(inquisitor.assets.Asset):
 
     def __init__(self, registrant, owned=None):
+        super(self.__class__, self).__init__(owned=owned)
         self.registrant = canonicalize(registrant)
-        self.owned = owned
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -73,23 +74,35 @@ class Registrant(object):
         # Return the results
         return results
 
-    def transform(self, sources):
+    def transform(self, repo, sources):
         # Prepare the results
         assets = set()
         # Google Transforms
-        if 'google' in sources:
-            # Acquire API
-            google = sources['google']
-            # Query: Plain
-            assets.update(google.transform(self.registrant))
+        if sources.get('google'):
+            subassets = self.cache_transform_get('google', repo)
+            if not subassets:
+                # Acquire API
+                google = sources['google']
+                # Query: Plain
+                subassets.update(google.transform(repo, self.registrant))
+                # Cache The Transform
+                self.cache_transform_store('google', subassets)
+            assets.update(subassets)
         # Shodan Transforms
-        if 'shodan' in sources:
-            # Acquire API
-            shodan = sources['shodan']
-            # Query: Plain
-            assets.update(shodan.transform(self.registrant))
-            # Query: Organization
-            assets.update(shodan.transform('org:"{}"'.format(self.registrant)))
+        if sources.get('shodan'):
+            subassets = self.cache_transform_get('shodan', repo)
+            if not subassets:
+                # Acquire API
+                shodan = sources['shodan']
+                # Query: Plain
+                subassets.update(shodan.transform(repo, self.registrant))
+                # Query: Organization
+                subassets.update(shodan.transform(
+                    repo, 'org:"{}"'.format(self.registrant))
+                )
+                # Cache The Transform
+                self.cache_transform_store('shodan', subassets)
+            assets.update(subassets)
         # Return the results
         return assets
 
@@ -97,6 +110,10 @@ class Registrant(object):
         if self.owned:
             return True
         return False
+
+    def parent_asset(self, repo):
+        # Registrants don't have parents
+        return None
 
 REPOSITORY = 'registrants'
 ASSET_CLASS = Registrant

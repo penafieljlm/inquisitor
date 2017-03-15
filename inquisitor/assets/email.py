@@ -1,4 +1,6 @@
+import inquisitor.assets
 import inquisitor.assets.host
+import logging
 import validate_email
 
 class EmailValidateException(Exception):
@@ -59,19 +61,19 @@ def main_classify_canonicalize(args):
     redundant = set.intersection(accepted, unmarked, rejected)
     if redundant:
         raise ValueError(
-            ('The following emails were classified '
-            'more than once: {}').format(list(redundant))
+            ('Conflicting classifications for emails '
+            ': {}').format(list(redundant))
         )
     accepted = set([canonicalize(a) for a in accepted])
     unmarked = set([canonicalize(a) for a in unmarked])
     rejected = set([canonicalize(a) for a in rejected])
     return (accepted, unmarked, rejected)
 
-class Email(object):
+class Email(inquisitor.assets.Asset):
 
     def __init__(self, email, owned=None):
+        super(self.__class__, self).__init__(owned=owned)
         self.email = canonicalize(email)
-        self.owned = owned
         recipient, domain = self.email.split('@')
         self.recipient = recipient
         self.domain = domain
@@ -85,20 +87,33 @@ class Email(object):
         # Prepare results
         results = set()
         # Related: Domain
-        asset = repo.get_asset_string(inquisitor.assets.host.Host, self.domain)
-        results.add(asset[1] if asset else inquisitor.assets.host.Host(self.domain))
+        try:
+            results.add(repo.get_asset_string(
+                inquisitor.assets.host.Host,
+                self.domain,
+                create=True,
+            )[1])
+        except inquisitor.assets.host.HostValidateException as e:
+            logging.error(e.message)
         # Return the results
         return results
 
-    def transform(self, sources):
+    def transform(self, repo, sources):
         # Prepare the results
         assets = set()
         # Google Transforms
-        if 'google' in sources:
-            # Acquire API
-            google = sources['google']
-            # Query: Email
-            assets.update(google.transform('"{}"'.format(self.email)))
+        if sources.get('google'):
+            subassets = self.cache_transform_get('google', repo)
+            if not subassets:
+                # Acquire API
+                google = sources['google']
+                # Query: Email
+                subassets.update(google.transform(
+                    repo, '"{}"'.format(self.email))
+                )
+                # Cache The Transform
+                self.cache_transform_store('google', subassets)
+            assets.update(subassets)
         # Return the results
         return assets
 
@@ -107,10 +122,29 @@ class Email(object):
         if self.owned is not None:
             return self.owned
         # Automatically determine ownership
-        host = repo.get_asset_string(inquisitor.assets.host.Host, self.domain)
-        if host and host[1].is_owned(repo):
-            return True
+        try:
+            host = repo.get_asset_string(inquisitor.assets.host.Host, self.domain)
+            if host and host[1].is_owned(repo):
+                return True
+        except inquisitor.assets.host.HostValidateException as e:
+            logging.error(e.message)
         return False
+
+    def parent_asset(self, repo):
+        # Prepare result variable
+        parent = None
+        # Check if this email's domain is a valid parent
+        if parent is None:
+            if self.domain:
+                try:
+                    host = repo.get_asset_string(inquisitor.assets.host.Host, self.domain)
+                    if host and host[1].is_owned(repo):
+                        parent = host[1]
+                        return parent
+                except inquisitor.assets.host.HostValidateException as e:
+                    logging.error(e.message)
+        # If no parental candidate is found, return None
+        return None
 
 REPOSITORY = 'emails'
 ASSET_CLASS = Email
