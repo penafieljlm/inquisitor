@@ -1,6 +1,7 @@
 import inquisitor.assets.block
 import inquisitor.assets.email
 import inquisitor.assets.host
+import inquisitor.assets.linkedin
 import inquisitor.assets.registrant
 import sys
 import unqlite
@@ -10,6 +11,7 @@ ASSET_MODULES = [
     inquisitor.assets.block,
     inquisitor.assets.host,
     inquisitor.assets.email,
+    inquisitor.assets.linkedin,
 ]
 
 class IntelligenceRepository:

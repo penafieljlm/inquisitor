@@ -1,6 +1,8 @@
 import googleapiclient.discovery
 import inquisitor.assets.email
 import inquisitor.assets.host
+import inquisitor.assets.linkedin
+import inquisitor.assets.registrant
 import inquisitor.extractors.emails
 import logging
 import urlparse
@@ -40,11 +42,12 @@ class GoogleAPI:
         assets = set()
         items = self.search(query)
         for item in items:
+            parsed_link = urlparse.urlparse(item['link'])
             # Extract Host
             try:
                 assets.add(repository.get_asset_string(
                     inquisitor.assets.host.Host,
-                    urlparse.urlparse(item['link']).netloc,
+                    parsed_link.netloc,
                     create=True,
                 )[1])
             except inquisitor.assets.host.HostValidateException as e:
@@ -59,6 +62,25 @@ class GoogleAPI:
                     )[1])
                 except inquisitor.assets.email.EmailValidateException as e:
                     logging.error(e.message)
-            # TODO: extract potential social media accounts via the 
-            # TODO: "pagemap/person" attribute
+            # Extract LinkedIn Accounts
+            if parsed_link.netloc.endswith('linkedin.com'):
+                try:
+                    # Create the asset
+                    asset = repository.get_asset_string(
+                        inquisitor.assets.linkedin.LinkedIn,
+                        parsed_link.netloc,
+                        create=True,
+                    )[1]
+                    # Apply work around for acquiring the corporation
+                    if (item.get('pagemap') and
+                        item.get('pagemap').get('person') and 
+                        item.get('pagemap').get('person').get('org')):
+                        asset.corporation = inquisitor.assets.registrant.canonicalize(
+                            item.get('pagemap').get('person').get('org')
+                        )
+                    # Add the asset
+                    assets.add(asset)
+                except inquisitor.assets.linkedin.LinkedInValidateException as e:
+                    logging.error(e.message)
+            # TODO: extract accounts for other social media networks
         return assets

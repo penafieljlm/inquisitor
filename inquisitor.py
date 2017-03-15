@@ -4,8 +4,12 @@ import inquisitor.sources.google_search
 import inquisitor.sources.shodan_search
 import json
 import logging
+import os
+import SimpleHTTPServer
+import SocketServer
 import sys
 import tabulate
+import webbrowser
 
 # Ininitialize Logging
 logger = logging.getLogger(__name__)
@@ -24,7 +28,8 @@ def scan(
     google_dev_key=None, 
     google_cse_id=None, 
     google_limit=None, 
-    shodan_api_key=None
+    shodan_api_key=None,
+    shodan_limit=None,
 ):
     sources = dict()
     # Initialize Google as a transform source
@@ -59,8 +64,13 @@ def scan(
         )
     else:
         sources['shodan'] = inquisitor.sources.shodan_search.ShodanAPI(
-            shodan_api_key
+            shodan_api_key, limit=shodan_limit
         )
+        if not shodan_limit:
+            logger.warning(
+                'Shodan Search limit not set. This may potentially exhaust '
+                'the daily quota of your Shodan API Key.'
+            )
     # Check if any sources detected
     if not sources:
         logger.error('No valid transform sources available. Quitting.')
@@ -203,16 +213,17 @@ def visualize(repository):
     # Start traversal
     root = {}
     traverse(root, None)
+    # Initialize web server directory
+    web_dir = os.path.join(os.path.dirname(__file__), 'report')
+    os.chdir(web_dir)
     # Dump visualization to JSON file
-    with open('report.json', 'w') as handle:
+    with open(os.path.join(web_dir, 'report.json'), 'w') as handle:
         json.dump(root, handle, indent=4, sort_keys=True)
     # Start HTTP Server
-    import SimpleHTTPServer
-    import SocketServer
-    import webbrowser
-    webbrowser.open('http://localhost:8080/report.html', new=2)
+    port = 8080
+    webbrowser.open('http://localhost:{}/index.html'.format(port), new=2)
     http_handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-    httpd = SocketServer.TCPServer(("", 8080), http_handler)
+    httpd = SocketServer.TCPServer(("", port), http_handler)
     httpd.serve_forever()
 
 # Entry Point
@@ -296,6 +307,16 @@ if __name__ == '__main__':
         ),
         dest='shodan_api_key',
     )
+    scan_parser.add_argument(
+        '--shodan-limit',
+        metavar='SHODAN_LIMIT',
+        type=int,
+        help=(
+            'The number of pages to limit Shodan Search to. This is to avoid '
+            'exhausting your daily quota.'
+        ),
+        default=None,
+    )
 
     # Parse arguments for status command
     status_parser = commands_subparsers.add_parser(
@@ -369,6 +390,7 @@ if __name__ == '__main__':
             google_cse_id=args.google_cse_id, 
             google_limit=args.google_limit,
             shodan_api_key=args.shodan_api_key,
+            shodan_limit=args.shodan_limit,
         )
         exit(0)
     if args.command == 'status':

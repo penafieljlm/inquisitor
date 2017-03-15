@@ -85,6 +85,10 @@ class Registrant(inquisitor.assets.Asset):
                 google = sources['google']
                 # Query: Plain
                 subassets.update(google.transform(repo, self.registrant))
+                # Query: LinkedIn
+                subassets.update(google.transform(
+                    repo, 'site:linkedin.com {}'.format(self.registrant)
+                ))
                 # Cache The Transform
                 self.cache_transform_store('google', subassets)
             assets.update(subassets)

@@ -14,6 +14,8 @@ class ShodanAPI:
         page = 1
         items = list()
         while True:
+            if self.limit and page > self.limit:
+                break
             results = self.service.search(query, page=page)
             items.extend(results['matches'])
             if len(items) >= results['total']:
