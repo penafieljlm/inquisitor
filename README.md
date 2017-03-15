@@ -38,7 +38,7 @@ command:
     classify            Classifies an existing asset as either belonging or
                         not belonging to the target. Adds a new asset with the
                         specified classification if none is present.
-    dump                Dumps the contents of the database in JSON format
+    dump                Dumps the contents of the database into a JSON file
     visualize           Create a D3.js visualization based on the contents of
                         the specified intelligence database.
 ```
@@ -49,7 +49,9 @@ In scan mode, the tool runs all available transforms for all the assets you have
 ```
 usage: inquisitor.py scan [-h] [--google-dev-key GOOGLE_DEV_KEY]
                           [--google-cse-id GOOGLE_CSE_ID]
+                          [--google-limit GOOGLE_LIMIT]
                           [--shodan-api-key SHODAN_API_KEY]
+                          [--shodan-limit SHODAN_LIMIT]
                           DATABASE
 
 positional arguments:
@@ -72,26 +74,34 @@ optional arguments:
                         Google Custom Search Engine. If not specified, the
                         script will simply skip asset transforms that involve
                         Google Search.
+  --google-limit GOOGLE_LIMIT
+                        The number of pages to limit Google Search to. This is
+                        to avoid exhausting your daily quota.
   --shodan-api-key SHODAN_API_KEY
                         Specifies the API key to use to query Shodan. Log into
                         your Shodan account (https://www.shodan.io/) and look
                         at the top right corner of the page in order to view
                         your API key. If not specified, the script will simply
                         skip asset transforms that involve Shodan.
+  --shodan-limit SHODAN_LIMIT
+                        The number of pages to limit Shodan Search to. This is
+                        to avoid exhausting your daily quota.
 ```
 
 ### Status
 
 In status mode, the tool simply prints out a quick summary of the status of your scan database.
 ```
-usage: inquisitor.py status [-h] DATABASE
+usage: inquisitor.py status [-h] [-s] DATABASE
 
 positional arguments:
-  DATABASE    The path to the intelligence database to use. If specified file
-              does not exist, a new one will be created.
+  DATABASE      The path to the intelligence database to use. If specified
+                file does not exist, a new one will be created.
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help    show this help message and exit
+  -s, --strong  Indicates if the status will be based on the strong ownership
+                classification.
 ```
 
 ### Classify
@@ -106,6 +116,9 @@ usage: inquisitor.py classify [-h] [-ar REGISTRANT [REGISTRANT ...]]
                               [-uh HOST [HOST ...]] [-rh HOST [HOST ...]]
                               [-ae EMAIL [EMAIL ...]] [-ue EMAIL [EMAIL ...]]
                               [-re EMAIL [EMAIL ...]]
+                              [-al LINKEDIN [LINKEDIN ...]]
+                              [-ul LINKEDIN [LINKEDIN ...]]
+                              [-rl LINKEDIN [LINKEDIN ...]]
                               DATABASE
 
 positional arguments:
@@ -139,34 +152,41 @@ optional arguments:
                         Specifies a email to classify as unmarked.
   -re EMAIL [EMAIL ...], --reject-email EMAIL [EMAIL ...]
                         Specifies a email to classify as rejected.
+  -al LINKEDIN [LINKEDIN ...], --accept-linkedin LINKEDIN [LINKEDIN ...]
+                        Specifies a LinkedIn Account to classify as accepted.
+  -ul LINKEDIN [LINKEDIN ...], --unmark-linkedin LINKEDIN [LINKEDIN ...]
+                        Specifies a LinkedIn Account to classify as unmarked.
+  -rl LINKEDIN [LINKEDIN ...], --reject-linkedin LINKEDIN [LINKEDIN ...]
+                        Specifies a LinkedIn Account to classify as rejected.
 ```
 
 ### Dump
 
 In dump mode, you will be able to dump the contents of the Intelligence Database into a human-readable JSON file.
 ```
-usage: inquisitor.py dump [-h] DATABASE JSON_FILE
+usage: inquisitor.py dump [-h] [-j FILE] [-a] DATABASE
 
 positional arguments:
-  DATABASE    The path to the intelligence database to use. If specified file
-              does not exist, a new one will be created.
-  JSON_FILE   The path to dump the JSON file to. Overwrites existing files.
+  DATABASE              The path to the intelligence database to use. If
+                        specified file does not exist, a new one will be
+                        created.
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help            show this help message and exit
+  -j FILE, --json FILE  The path to dump the JSON file to. Overwrites existing
+                        files.
+  -a, --all             Include rejected assets in dump.
 ```
 
 ### Visualize
 
 In visualize mode, you will be able to acquire a hierarchical visualization of the Intelligence Repository.
 ```
-usage: inquisitor.py visualize [-h] DATABASE HTML_FILE
+usage: inquisitor.py visualize [-h] DATABASE
 
 positional arguments:
   DATABASE    The path to the intelligence database to use. If specified file
               does not exist, a new one will be created.
-  HTML_FILE   The path to dump the visualization file to. Overwrites existing
-              files.
 
 optional arguments:
   -h, --help  show this help message and exit
