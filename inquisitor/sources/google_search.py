@@ -31,7 +31,8 @@ class GoogleAPI:
                     cx=self.cse_id,
                     start=start,
                 ).execute()
-                items.extend(results['items'])
+                if results.get('items'):
+                    items.extend(results.get('items'))
                 start += 10
                 page += 1
             except googleapiclient.errors.HttpError:
@@ -63,7 +64,7 @@ class GoogleAPI:
                 except inquisitor.assets.email.EmailValidateException as e:
                     logging.error(e.message)
             # Extract LinkedIn Accounts
-            if parsed_link.netloc.endswith('linkedin.com'):
+            if parsed_link.netloc.endswith('.linkedin.com'):
                 try:
                     # Create the asset
                     asset = repository.get_asset_string(

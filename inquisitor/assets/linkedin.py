@@ -15,7 +15,7 @@ def canonicalize(linkedin):
     linkedin = linkedin.strip().lower()
     parsed = urlparse.urlparse(linkedin)
     # Validate Network Location
-    if not parsed.netloc.endswith('linkedin.com'):
+    if not parsed.netloc.endswith('.linkedin.com'):
         raise LinkedInValidateException(
             'Failed to validate LinkedIn account: {}'.format(linkedin)
         )
@@ -73,7 +73,7 @@ def main_classify_canonicalize(args):
 
 class LinkedIn(inquisitor.assets.Asset):
 
-    def __init__(self, linkedin):
+    def __init__(self, linkedin, owned=False):
         super(self.__class__, self).__init__(owned=owned)
         self.linkedin = canonicalize(linkedin)
         self.username = urlparse.urlparse(self.linkedin).path.split('/')[3]

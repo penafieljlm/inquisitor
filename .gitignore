@@ -1,3 +1,4 @@
 *.pyc
 *.bat
 *.json
+*.db

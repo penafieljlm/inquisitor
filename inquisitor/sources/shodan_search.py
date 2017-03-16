@@ -17,7 +17,8 @@ class ShodanAPI:
             if self.limit and page > self.limit:
                 break
             results = self.service.search(query, page=page)
-            items.extend(results['matches'])
+            if results.get('matches'):
+                items.extend(results.get('matches'))
             if len(items) >= results['total']:
                 break
             page += 1

@@ -123,6 +123,8 @@ class Host(inquisitor.assets.Asset):
                     continue
                 except ipwhois.exceptions.HTTPRateLimitError:
                     continue
+                except ipwhois.exceptions.IPDefinedError:
+                    continue
         self.blocks = list(self.blocks)
 
     def __eq__(self, other):
