@@ -1,37 +1,97 @@
 from nose.tools import *
-import inquisitor
+import inq
 
 def setup():
-    # TODO: Implement
-    # If you see this text, there probably wasn't enough time for me to finish the project
     pass
 
 def teardown():
-    # TODO: Implement
-    # If you see this text, there probably wasn't enough time for me to finish the project
     pass
 
-def test_scan():
-    # TODO: Implement
-    # If you see this text, there probably wasn't enough time for me to finish the project
-    pass
-
-def test_status():
-    # TODO: Implement
-    # If you see this text, there probably wasn't enough time for me to finish the project
-    pass
-
-def test_classify():
-    # TODO: Implement
-    # If you see this text, there probably wasn't enough time for me to finish the project
-    pass
-
-def test_dump():
-    # TODO: Implement
-    # If you see this text, there probably wasn't enough time for me to finish the project
-    pass
-
-def test_visualize():
-    # TODO: Implement
-    # If you see this text, there probably wasn't enough time for me to finish the project
-    pass
+def test_inquisitor():
+    # Accept Host
+    inq.main(['classify', 'coke.db', '-ah', 'coca-cola.com'])
+    # Accept Registrants
+    inq.main(['classify', 'coke.db', '-ar', 'COCA-COLA ENTERPRISES'])
+    inq.main(['classify', 'coke.db', '-ar', 'COCA-COLA BOTTLING COMPANY OF MINDEN, INC.'])
+    inq.main(['classify', 'coke.db', '-ar', 'COCA-COLA BOTTLING COMPANY OF MINDEN'])
+    inq.main(['classify', 'coke.db', '-ar', 'COCA COLA NETWORK REDIRECT'])
+    inq.main(['classify', 'coke.db', '-ar', 'THE COCA-COLA COMPANY'])
+    inq.main(['classify', 'coke.db', '-ar', 'COCA-COLA HBC SERVICES MEPE'])
+    # Reject Registrants
+    inq.main(['classify', 'coke.db', '-rr', 'BH MEDIA GROUP INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'AMAZON TECHNOLOGIES'])
+    inq.main(['classify', 'coke.db', '-rr', 'LINODE'])
+    inq.main(['classify', 'coke.db', '-rr', 'HUBSPOT INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'AMAZON.COM'])
+    inq.main(['classify', 'coke.db', '-rr', 'LINKEDIN CORPORATION'])
+    inq.main(['classify', 'coke.db', '-rr', 'LEAF GROUP, LTD.'])
+    inq.main(['classify', 'coke.db', '-rr', 'LEAF GROUP LTD.'])
+    inq.main(['classify', 'coke.db', '-rr', 'DOMAIN PROTECTION SERVICES, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'CHRIS GASTON'])
+    inq.main(['classify', 'coke.db', '-rr', 'NSONE INC'])
+    inq.main(['classify', 'coke.db', '-rr', 'INTERNATIONAL MOTORSPORTS ASSOCIATION, LLC'])
+    inq.main(['classify', 'coke.db', '-rr', 'SHYAMA ECONSULTANCY LIMITED'])
+    inq.main(['classify', 'coke.db', '-rr', 'ALEXA INTERNET'])
+    inq.main(['classify', 'coke.db', '-rr', 'POOL PRODUCTIONS'])
+    inq.main(['classify', 'coke.db', '-rr', 'TWITTER, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'TWITTER INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'INSTAGRAM, LLC'])
+    inq.main(['classify', 'coke.db', '-rr', 'FACEBOOK, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'REGISTRARSEC, LLC'])
+    inq.main(['classify', 'coke.db', '-rr', 'GET SATISFACTION'])
+    inq.main(['classify', 'coke.db', '-rr', 'GOOGLE INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'AUTOMATTIC, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'AUTOMATTIC, INC'])
+    inq.main(['classify', 'coke.db', '-rr', 'DOMAINS BY PROXY, LLC'])
+    inq.main(['classify', 'coke.db', '-rr', 'WHOIS PRIVACY SERVICE'])
+    inq.main(['classify', 'coke.db', '-rr', 'SINGLEHOP, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'CYBERNET QUEST'])
+    inq.main(['classify', 'coke.db', '-rr', 'QWEST COMMUNICATIONS COMPANY, LLC'])
+    inq.main(['classify', 'coke.db', '-rr', 'GKG.NET DOMAIN PROXY SERVICE'])
+    inq.main(['classify', 'coke.db', '-rr', 'INTRAWORLD COMMUNICATIONS CORPORATION'])
+    inq.main(['classify', 'coke.db', '-rr', 'HYDROSOFT INTERNET'])
+    inq.main(['classify', 'coke.db', '-rr', 'KSREGISTRY GMBH'])
+    inq.main(['classify', 'coke.db', '-rr', 'OVH HOSTING, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'WOODYNET'])
+    inq.main(['classify', 'coke.db', '-rr', 'KEY-SYSTEMS GMBH'])
+    inq.main(['classify', 'coke.db', '-rr', 'ACTIVE MINDS GMBH'])
+    inq.main(['classify', 'coke.db', '-rr', 'LIQUID WEB, L.L.C'])
+    inq.main(['classify', 'coke.db', '-rr', 'WHOIS INC'])
+    inq.main(['classify', 'coke.db', '-rr', 'PUBLICDOMAINREGISTRY.COM'])
+    inq.main(['classify', 'coke.db', '-rr', 'CLOUDFLARE, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'PDR LTD.'])
+    inq.main(['classify', 'coke.db', '-rr', 'ADVAMEG, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'INKTOMI CORPORATION'])
+    inq.main(['classify', 'coke.db', '-rr', 'YAHOO! INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'YAHOO! BROADCAST SERVICES, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'SOFTLAYER TECHNOLOGIES, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'SOFTLAYER CORPORATE C'])
+    inq.main(['classify', 'coke.db', '-rr', 'DNSTINATION INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'INTERNETNAMESFORBUSINESS.COM'])
+    inq.main(['classify', 'coke.db', '-rr', 'INTERNATIONAL BUSINESS MACHINES CORPORATION'])
+    inq.main(['classify', 'coke.db', '-rr', 'IBM'])
+    inq.main(['classify', 'coke.db', '-rr', 'ENOM, INCORPORATED'])
+    inq.main(['classify', 'coke.db', '-rr', 'OVH (NWK)'])
+    inq.main(['classify', 'coke.db', '-rr', 'SOFTLAYER TECHNOLOGIES INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'INFORMER TECHNOLOGIES, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'GODADDY.COM, LLC'])
+    inq.main(['classify', 'coke.db', '-rr', 'GO DADDY OPERATING COMPANY, LLC'])
+    inq.main(['classify', 'coke.db', '-rr', 'TUCOWS.COM CO.'])
+    inq.main(['classify', 'coke.db', '-rr', 'TUCOWS.COM CO'])
+    inq.main(['classify', 'coke.db', '-rr', 'NEUSTAR, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'DYN'])
+    inq.main(['classify', 'coke.db', '-rr', 'DYN INC'])
+    inq.main(['classify', 'coke.db', '-rr', 'AMAZON TECHNOLOGIES, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'AKAMAI TECHNOLOGIES, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'MARKMONITOR'])
+    inq.main(['classify', 'coke.db', '-rr', 'DYNAMIC NETWORK SERVICES, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'MARKMONITOR INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'WIKIMEDIA FOUNDATION INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'WIKIMEDIA FOUNDATION, INC.'])
+    inq.main(['classify', 'coke.db', '-rr', 'INSALA, LLC'])
+    # Test Dump
+    inq.main(['dump', 'coke.db', '-j', 'coke.json'])
+    # Test Status
+    inq.main(['status', 'coke.db'])
+    # Test Status Strong
+    inq.main(['status', 'coke.db', '--strong'])

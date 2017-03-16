@@ -183,42 +183,42 @@ def dump(repository, path, all_flag):
         with open(path, 'w') as handle:
             json.dump(repo_dict, handle, indent=4, sort_keys=True)
 
-def visualize(repository):
-    # TODO: use circle packing https://bl.ocks.org/mbostock/7607535
-    def traverse(node, asset):
-        # Determine name of node
-        if asset:
-            asset_type = asset.__class__
-            asset_module = sys.modules[asset_type.__module__]
-            node['name'] = '{} : {}'.format(
-                asset_type.__name__,
-                getattr(asset, asset_module.OBJECT_ID)
+def visualize(repository, use_last=False):
+    if not use_last:
+        def traverse(node, asset):
+            # Determine name of node
+            if asset:
+                asset_type = asset.__class__
+                asset_module = sys.modules[asset_type.__module__]
+                node['name'] = '{} : {}'.format(
+                    asset_type.__name__,
+                    getattr(asset, asset_module.OBJECT_ID)
+                )
+            else:
+                node['name'] = 'root'
+            # Determine node children
+            children = repository.get_assets(
+                include=lambda o,d:
+                    o.is_owned(repository) and
+                    o.parent_asset(repository) == asset
             )
-        else:
-            node['name'] = 'root'
-        # Determine node children
-        children = repository.get_assets(
-            include=lambda o,d:
-                o.is_owned(repository) and
-                o.parent_asset(repository) == asset
-        )
-        if children:
-            node['children'] = list()
-            for child in children:
-                subnode = dict()
-                traverse(subnode, child)
-                node['children'].append(subnode)
-        else:
-            node['size'] = 1
-    # Start traversal
-    root = {}
-    traverse(root, None)
-    # Initialize web server directory
-    web_dir = os.path.join(os.path.dirname(__file__), 'report')
-    os.chdir(web_dir)
-    # Dump visualization to JSON file
-    with open('report.json', 'w') as handle:
-        json.dump(root, handle, indent=4, sort_keys=True)
+            if children:
+                node['children'] = list()
+                for child in children:
+                    subnode = dict()
+                    traverse(subnode, child)
+                    node['children'].append(subnode)
+            else:
+                node['size'] = 1
+        # Start traversal
+        root = {}
+        traverse(root, None)
+        # Initialize web server directory
+        web_dir = os.path.join(os.path.dirname(__file__), 'report')
+        os.chdir(web_dir)
+        # Dump visualization to JSON file
+        with open('report.json', 'w') as handle:
+            json.dump(root, handle, indent=4, sort_keys=True)
     # Start HTTP Server
     port = 8080
     webbrowser.open('http://localhost:{}/index.html'.format(port), new=2)
@@ -226,9 +226,8 @@ def visualize(repository):
     httpd = SocketServer.TCPServer(("", port), http_handler)
     httpd.serve_forever()
 
-# Entry Point
-if __name__ == '__main__':
-    
+def main(cmd_args):
+
     # Create main argument parser
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument(
@@ -378,9 +377,18 @@ if __name__ == '__main__':
         ),
         parents=[parent_parser],
     )
+    visualize_parser.add_argument(
+        '-l', '--last',
+        help=(
+            'Simply open the last visualization generated instead of creating '
+            'a new one.'
+        ),
+        action='store_true',
+        default=False,
+    )
 
     # Perform actual parsing of arguments
-    args = main_parser.parse_args()
+    args = main_parser.parse_args(cmd_args)
 
     # Determine chosen command and pass to appropriate subroutine
     if args.command == 'scan':
@@ -395,13 +403,18 @@ if __name__ == '__main__':
         exit(0)
     if args.command == 'status':
         status(args.database, args.strong)
-        exit(0)
+        return
     if args.command == 'classify':
         classify(args.database, args)
-        exit(0)
+        return
     if args.command == 'dump':
         dump(args.database, args.json, args.all)
-        exit(0)
+        return
     if args.command == 'visualize':
-        visualize(args.database)
-        exit(0)
+        visualize(args.database, args.last)
+        return
+
+# Entry Point
+if __name__ == '__main__':
+    # Call the main function
+    main(sys.argv[1:])

@@ -25,7 +25,7 @@ config = {
         'validate_email',
     ],
     'packages': ['inquisitor'],
-    'scripts': ['inquisitor.py'],
+    'scripts': ['inq.py'],
     'name': 'inquisitor'
 }
 
