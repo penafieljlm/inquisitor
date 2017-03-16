@@ -184,6 +184,9 @@ def dump(repository, path, all_flag):
             json.dump(repo_dict, handle, indent=4, sort_keys=True)
 
 def visualize(repository, use_last=False):
+    # Initialize web server directory
+    web_dir = os.path.join(os.path.dirname(__file__), 'report')
+    os.chdir(web_dir)
     if not use_last:
         def traverse(node, asset):
             # Determine name of node
@@ -213,9 +216,6 @@ def visualize(repository, use_last=False):
         # Start traversal
         root = {}
         traverse(root, None)
-        # Initialize web server directory
-        web_dir = os.path.join(os.path.dirname(__file__), 'report')
-        os.chdir(web_dir)
         # Dump visualization to JSON file
         with open('report.json', 'w') as handle:
             json.dump(root, handle, indent=4, sort_keys=True)
