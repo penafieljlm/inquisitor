@@ -76,7 +76,7 @@ class LinkedIn(inquisitor.assets.Asset):
     def __init__(self, linkedin, owned=False):
         super(self.__class__, self).__init__(owned=owned)
         self.linkedin = canonicalize(linkedin)
-        self.username = urlparse.urlparse(self.linkedin).path.split('/')[3]
+        self.username = urlparse.urlparse(self.linkedin).path.split('/')[2]
         # TODO: This should be retrieved using linkedin api but we don't have
         # TODO: time for that, so fill it up using Google Search results
         # TODO: instead
