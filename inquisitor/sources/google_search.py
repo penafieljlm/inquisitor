@@ -69,7 +69,7 @@ class GoogleAPI:
                     # Create the asset
                     asset = repository.get_asset_string(
                         inquisitor.assets.linkedin.LinkedIn,
-                        parsed_link.netloc,
+                        item['link'],
                         create=True,
                     )[1]
                     # Apply work around for acquiring the corporation
