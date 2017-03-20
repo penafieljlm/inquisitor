@@ -18,6 +18,7 @@ config = {
         'nose',
         'python-whois',
         'shodan',
+        'simplejson',
         'tabulate',
         'tld',
         'unidecode',
