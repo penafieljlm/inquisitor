@@ -20,7 +20,7 @@ def canonicalize(linkedin):
             'Failed to validate LinkedIn account: {}'.format(linkedin)
         )
     # Validate Path
-    if not parser.path.startswith('/in/'):
+    if not parsed.path.startswith('/in/'):
         raise LinkedInValidateException(
             'Failed to validate LinkedIn account: {}'.format(linkedin)
         )
