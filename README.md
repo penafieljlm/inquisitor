@@ -18,7 +18,7 @@ The whole concept of Inquisitor revolves around the idea of extracting informati
 
 To install Inquisitor, simply clone the repository, enter it, and execute the installation script.
 ```
-pip install Cython
+pip install Cython click
 git clone git@github.com:penafieljlm/inquisitor.git
 cd inquisitor
 python setup.py install
