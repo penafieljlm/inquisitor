@@ -75,7 +75,7 @@ class GoogleAPI:
                     # Apply work around for acquiring the corporation
                     if (item.get('pagemap') and
                         item.get('pagemap').get('person') and 
-                        item.get('pagemap').get('person').get('org')):
+                        item.get('pagemap').get('person')[0].get('org')):
                         asset.corporation = inquisitor.assets.registrant.canonicalize(
                             item.get('pagemap').get('person').get('org')
                         )
