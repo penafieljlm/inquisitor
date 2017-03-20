@@ -14,7 +14,7 @@ config = {
         'cython',
         'google-api-python-client',
         'ipwhois',
-        'netaddr'
+        'netaddr',
         'nose',
         'python-whois',
         'shodan',
