@@ -555,3 +555,7 @@ The scan mode isn't fully tested because of quotas concerning the search engines
 ## Future Developments
 
 I should probably add a filter feature to dump and classify (especially classify, so classifications can be made en masse, e.g. "reject all hosts under fb.com" or something like that).
+
+Note to self: normalizing the database was a bad idea. Go for a non-normalized format to make visualization faster.
+
+Another note to self: Cache the results of whois, ipwhois, Shodan, and Google. It's a pain having to test this thing when the daily quota for the APIs run out.
