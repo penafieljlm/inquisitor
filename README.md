@@ -1,5 +1,7 @@
 # Inquisitor
 
+> **Note: The development of this tool was originally part of my application to a company I was applying with. I was given four days to build it from the ground up so I'm probably going to do some cleanup first before I move forward with adding new features. Please bear with me here.**
+
 Inquisitor is a simple for gathering information on companies and organizations through the use of Open Source Intelligence (OSINT) sources.
 
 The key features of Inquisitor include:
