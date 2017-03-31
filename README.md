@@ -1,14 +1,12 @@
 # Inquisitor
 
-Inquisitor is a simple for gathering information on companies and organizations through the use of Open Source Intelligence (OSINT) sources.
+Inquisitor is a simple tool for gathering information on companies and organizations through the use of Open Source Intelligence (OSINT) sources. It is heavily inspired from how Maltego and recon-ng operates, and the tool pretty much re-implements some of the features of those tools but adds an additonal layer of opinion-based semantics on top of asset types in order to create an easy-to-use workflow.
 
 The key features of Inquisitor include:
 
 1. The ability to cascade the ownership label of an asset (e.g. if a Registrant Name is known to belong to the target organization, then the hosts and networks registered with that name shall be marked as belonging to the target organization)
 2. The ability transform assets into other potentially related assets through querying open sources such as Google and Shodan
 3. The ability to visualize the relationships of those assets through a zoomable pack layout
-
-It is heavily inspired from how Maltego operates, except in this tool, all transforms are performed automatically.
 
 ## Concept
 
@@ -198,6 +196,38 @@ optional arguments:
   -l, --last  Simply open the last visualization generated instead of creating
               a new one.
 ```
+
+## Workflow
+
+Now that you know the basic features of Inquisitor, it's time you learn how to *actually* use it. Inquisitor has been written with the following steps in mind:
+
+### Seeding
+
+In this step, your Intelligence Database doesn't have anything in it yet. We're going to have to start somewhere so go ahead and seed the database with assets that you know belong to your target organization. You can do this using the `classify` command.
+
+### Scanning
+
+Now that the database has assets that are known to belong to your target organization. You can then proceed with scanning. You can do this using the `scan` command.
+
+When you invoke the `scan` command on your Intelligence Database, Inquisitor proceeds to run the `transform` methods of assets that are classified as `accepted`. Once scanning is finished, you're going to end up with more assets that might potentially belong to your target organization.
+
+If you don't end up with any new assets, you can either seed your Intelligence Database with new information, or simply proceed to wrap up the process by proceeding to the Reporting step.
+
+### Classifying
+
+While Inquisitor performs automatic asset classification for you, it might end up missing some assets that do, in fact, belong to your target organization.
+
+When this happens, you're going to have to check the database contents and manually classify the assets. Usually, you'd want to pay attention to **Registrant** assets as there is no way to automatically determine ownership for that asset type. Also most other asset types rely on the ownership classification of Registrant assets in order to determine whether they belong to your target or not, so it's definitelty best to pay attention to your Registrant assets. Additionally, you don't end up with a lot of Registrant assets in the first place so it's not going to be that hard sifting through them.
+
+### Reporting
+
+You can generate a visualization of the assets that belong to your target organization using the `visualize` command or the `dump` command.
+
+## Demo
+
+I have video ddemonstrations of the tool running in the following link: https://drive.google.com/open?id=0B_O70BVu38TRclo5dWRBWkdTTWc
+
+I wasn't able to fully record the run of the scan command though since my free screen recorder only records up to 10 minutes.
 
 ## Development
 
@@ -549,7 +579,3 @@ After implementing the above methods, make sure you set the `REPOSITORY`, `ASSET
 ## Contact and Notes
 
 The scan mode isn't fully tested because of quotas concerning the search engines involved. Also, this project was made in a rush as part of a week-long hackaton challenge so there might be a lot of problems lying around. Please create an issue ticket or contact me at penafieljlm@gmail.com if you find a bug or have some questions.
-
-## Future Developments
-
-I should probably add a filter feature to dump and classify (especially classify, so classifications can be made en masse, e.g. "reject all hosts under fb.com" or something like that).
