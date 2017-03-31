@@ -559,3 +559,5 @@ I should probably add a filter feature to dump and classify (especially classify
 Note to self: normalizing the database was a bad idea. Go for a non-normalized format to make visualization faster.
 
 Another note to self: Cache the results of whois, ipwhois, Shodan, and Google. It's a pain having to test this thing when the daily quota for the APIs run out.
+
+Add new feature: `audit`. This quickly scans the assets that you have gathered for threats (e.g. vulnerable webserver versions, previously comprimised emails and social media accounts [use HaveIBeenPwned]).
