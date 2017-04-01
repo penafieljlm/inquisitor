@@ -221,7 +221,7 @@ If you don't end up with any new assets, you can either seed your Intelligence D
 
 While Inquisitor performs automatic asset classification for you, it might end up missing some assets that do, in fact, belong to your target organization.
 
-When this happens, you're going to have to check the database contents and manually classify the assets. Usually, you'd want to pay attention to **Registrant** assets as there is no way to automatically determine ownership for that asset type, while most other asset types rely on the ownership classification of Registrant assets in order to determine whether they belong to your target or not.
+When this happens, you're going to have to check the database contents and manually classify the assets. Usually, you'd want to pay attention to **Registrant** assets as there is no way to automatically determine ownership for that asset type. Also most other asset types rely on the ownership classification of Registrant assets in order to determine whether they belong to your target or not, so it's definitelty best to pay attention to your Registrant assets. Additionally, you don't end up with a lot of Registrant assets in the first place so it's not going to be that hard sifting through them.
 
 ### Reporting
 
