@@ -583,15 +583,3 @@ After implementing the above methods, make sure you set the `REPOSITORY`, `ASSET
 ## Contact and Notes
 
 The scan mode isn't fully tested because of quotas concerning the search engines involved. Also, this project was made in a rush as part of a week-long hackaton challenge so there might be a lot of problems lying around. Please create an issue ticket or contact me at penafieljlm@gmail.com if you find a bug or have some questions.
-
-## Future Developments
-
-I should probably add a filter feature to dump and classify (especially classify, so classifications can be made en masse, e.g. "reject all hosts under fb.com" or something like that).
-
-Note to self: normalizing the database was a bad idea. Go for a non-normalized format to make visualization faster.
-
-Another note to self: Cache the results of whois, ipwhois, Shodan, and Google. It's a pain having to test this thing when the daily quota for the APIs run out.
-
-Add new feature: `audit`. This quickly scans the assets that you have gathered for threats (e.g. vulnerable webserver versions, previously comprimised emails and social media accounts [use HaveIBeenPwned]).
-
-I probably should add a "keychain" feature as well like the one in recon-ng. And maybe allow each "source" to be invoked directly (like recon-ng) for debugging purposes.
