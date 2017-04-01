@@ -201,6 +201,38 @@ optional arguments:
               a new one.
 ```
 
+## Workflow
+
+Now that you know the basic features of Inquisitor, it's time you learn how to *actually* use it. Inquisitor has been written with the following steps in mind:
+
+### Seeding
+
+In this step, your Intelligence Database doesn't have anything in it yet. We're going to have to start somewhere so go ahead and seed the database with assets that you know belong to your target organization. You can do this using the `classify` command.
+
+### Scanning
+
+Now that the database has assets that are known to belong to your target organization. You can then proceed with scanning. You can do this using the `scan` command.
+
+When you invoke the `scan` command on your Intelligence Database, Inquisitor proceeds to run the `transform` methods of assets that are classified as `accepted`. Once scanning is finished, you're going to end up with more assets that might potentially belong to your target organization.
+
+If you don't end up with any new assets, you can either seed your Intelligence Database with new information, or simply proceed to wrap up the process by proceeding to the Reporting step.
+
+### Classifying
+
+While Inquisitor performs automatic asset classification for you, it might end up missing some assets that do, in fact, belong to your target organization.
+
+When this happens, you're going to have to check the database contents and manually classify the assets. Usually, you'd want to pay attention to **Registrant** assets as there is no way to automatically determine ownership for that asset type, while most other asset types rely on the ownership classification of Registrant assets in order to determine whether they belong to your target or not.
+
+### Reporting
+
+You can generate a visualization of the assets that belong to your target organization using the `visualize` command or the `dump` command.
+
+## Demo
+
+I have video ddemonstrations of the tool running in the following link: https://drive.google.com/open?id=0B_O70BVu38TRclo5dWRBWkdTTWc
+
+I wasn't able to fully record the run of the scan command though since my free screen recorder only records up to 10 minutes.
+
 ## Development
 
 The the Inquisitor project is laid out in the following format:
@@ -561,3 +593,5 @@ Note to self: normalizing the database was a bad idea. Go for a non-normalized f
 Another note to self: Cache the results of whois, ipwhois, Shodan, and Google. It's a pain having to test this thing when the daily quota for the APIs run out.
 
 Add new feature: `audit`. This quickly scans the assets that you have gathered for threats (e.g. vulnerable webserver versions, previously comprimised emails and social media accounts [use HaveIBeenPwned]).
+
+I probably should add a "keychain" feature as well like the one in recon-ng. And maybe allow each "source" to be invoked directly (like recon-ng) for debugging purposes.
