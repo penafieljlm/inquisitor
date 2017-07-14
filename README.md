@@ -12,6 +12,8 @@ The key features of Inquisitor include:
 
 The whole concept of Inquisitor revolves around the idea of extracting information from open sources based on what is already known about a target organization. In the context of Inquisitor these are called "transforms". Related information may also be immidiately retrieved from an known asset based on metadata also retrievable from open sources such as whois and internet registries.
 
+The concepts are discussed in further detail in this blog article: https://penafieljlm.com/2017/07/14/inquisitor/
+
 ## Installation
 
 To install Inquisitor, simply clone the repository, enter it, and execute the installation script.
