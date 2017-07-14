@@ -1,5 +1,8 @@
 # Inquisitor
 
+> #### Notice
+> This project is only partially complete and I have yet to implement many of the features described in the following blog post I made: https://penafieljlm.com/2017/07/14/inquisitor/.
+
 Inquisitor is a simple tool for gathering information on companies and organizations through the use of Open Source Intelligence (OSINT) sources. It is heavily inspired from how Maltego and recon-ng operates, and the tool pretty much re-implements some of the features of those tools but adds an additonal layer of opinion-based semantics on top of asset types in order to create an easy-to-use workflow.
 
 The key features of Inquisitor include:
