@@ -584,3 +584,9 @@ After implementing the above methods, make sure you set the `REPOSITORY`, `ASSET
 ## Contact and Notes
 
 The scan mode isn't fully tested because of quotas concerning the search engines involved. Also, this project was made in a rush as part of a week-long hackaton challenge so there might be a lot of problems lying around. Please create an issue ticket or contact me at penafieljlm@gmail.com if you find a bug or have some questions.
+
+## Disclaimer
+
+This work is derived from the approaches implemented by the Maltego and recon-ng Open Source Intelligence tools. I supplemented these approaches with ideas that are either already common knowledge (e.g. whois tells you who the owner of a domain is, subdomains are owned by the same organization owning their parent – as implied by domain name bruteforcing attacks, organizations are the authoritative of the domain names that they own, etc.), or are original and were conceived by me in my own personal time as part of my hobby (e.g. acceptability ratings, various transforms, classification inheritance, etc.).
+
+No component of this work was derived from any work that I have done for any employer in the past. The whole project, including the proof-of-concept, was written from scratch and was augmented with ideas from the information security community.
