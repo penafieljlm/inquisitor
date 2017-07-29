@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'Google OSINT Tool',
+    'description': 'Opinionated organisation-centric OSINT inspired from recon-ng and Maltego',
     'author': 'John Lawrence M. Penafiel',
     'url': 'https://github.com/penafieljlm/inquisitor',
     'download_url': 'https://github.com/penafieljlm/inquisitor',
